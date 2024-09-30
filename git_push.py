@@ -25,7 +25,7 @@ def git_push(commit_message):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Push changes to git repository.")
-    parser.add_argument("commit_message", type=str, help="The commit message for the changes.")
+    parser.add_argument("commit_message", type=str, nargs='?', default="commit", help="The commit message for the changes.")
     args = parser.parse_args()
     
     # 取得當前時間並格式化
