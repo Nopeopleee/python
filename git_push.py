@@ -8,7 +8,7 @@ def git_push(commit_message):
     try:
         repo = git.Repo(os.getcwd())
         repo.git.add(A=True)
-        repo.index.commit("commit message")
+        repo.index.commit(commit_message)
         origin = repo.remote(name='origin')
         push_info = origin.push(refspec='main')
         
