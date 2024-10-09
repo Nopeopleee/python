@@ -7,6 +7,12 @@ from datetime import datetime
 def git_push(commit_message, branch="main", path="."):
     try:
         repo = git.Repo(path)
+
+        changelog_path = os.path.join(path, "changelog.txt")
+        with open(changelog_path, "a") as changelog_file:
+            changelog_file.write(f"{commit_message}\n")
+        print(f"Commit message written to {changelog_path}")
+
         repo.git.add(A=True)
         print(commit_message)
         repo.index.commit(commit_message)
@@ -20,11 +26,6 @@ def git_push(commit_message, branch="main", path="."):
             else:
                 print(f"Success: {info.summary}")
 
-        changelog_path = os.path.join(path, "changelog.txt")
-        with open(changelog_path, "a") as changelog_file:
-            changelog_file.write(f"{commit_message}\n")
-        print(f"Commit message written to {changelog_path}")
-        
     except git.exc.GitCommandError as e:
         print(f"Git command error: {e}")
     except Exception as e:
