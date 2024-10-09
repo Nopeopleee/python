@@ -4,9 +4,9 @@ import argparse
 from datetime import datetime
 
 
-def git_push(commit_message, branch="main"):
+def git_push(commit_message, branch="main", path="."):
     try:
-        repo = git.Repo(os.getcwd())
+        repo = git.Repo(path)
         repo.git.add(A=True)
         print(commit_message)
         repo.index.commit(commit_message)
@@ -28,10 +28,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Push changes to git repository.")
     parser.add_argument("commit_message", type=str, nargs='?', default="commit", help="The commit message for the changes.")
     parser.add_argument("--branch", type=str, default="main", help="The branch to push the changes to.")
+    parser.add_argument("--path", type=str, default=".", help="The path to the git repository.")
     args = parser.parse_args()
     
     # 取得當前時間並格式化
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     full_commit_message = f"{args.commit_message} - {current_time}"
     
-    git_push(full_commit_message, args.branch)
+    git_push(full_commit_message, args.branch, args.path)
