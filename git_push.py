@@ -19,6 +19,12 @@ def git_push(commit_message, branch="main", path="."):
                 print(f"Error: {info.summary}")
             else:
                 print(f"Success: {info.summary}")
+
+        changelog_path = os.path.join(path, "changelog.txt")
+        with open(changelog_path, "a") as changelog_file:
+            changelog_file.write(f"{commit_message}\n")
+        print(f"Commit message written to {changelog_path}")
+        
     except git.exc.GitCommandError as e:
         print(f"Git command error: {e}")
     except Exception as e:
