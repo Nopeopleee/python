@@ -4,8 +4,11 @@ import argparse
 from datetime import datetime
 
 
-def git_push(commit_message, branch="main", path="."):
+def git_push(commit_message, branch="main", path=".", ssh_key=None):
     try:
+        if ssh_key:
+            os.environ["GIT_SSH_COMMAND"] = f"ssh -i {ssh_key}"
+
         repo = git.Repo(path)
 
         changelog_path = os.path.join(path, "changelog.txt")
@@ -36,10 +39,11 @@ if __name__ == "__main__":
     parser.add_argument("commit_message", type=str, nargs='?', default="commit", help="The commit message for the changes.")
     parser.add_argument("--branch", type=str, default="main", help="The branch to push the changes to.")
     parser.add_argument("--path", type=str, default=".", help="The path to the git repository.")
+    parser.add_argument("--ssh-key", type=str, help="The path to the SSH key file.")
     args = parser.parse_args()
     
     # 取得當前時間並格式化
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     full_commit_message = f"{args.commit_message} - {current_time}"
     
-    git_push(full_commit_message, args.branch, args.path)
+    git_push(full_commit_message, args.branch, args.path, args.ssh_key)
