@@ -3,7 +3,7 @@ import string
 import argparse
 
 def random_string(length):
-    characters = string.ascii_letters + string.digits + string.punctuation
+    characters = string.ascii_letters + string.digits 
     return ''.join(random.choice(characters) for i in range(length))
 
 if __name__ == "__main__":
