@@ -1,41 +1,44 @@
 from flask import Flask, request, send_file, jsonify
 from io import BytesIO
 import torch
-from diffusers import StableDiffusion3Pipeline
+from diffusers import StableDiffusionPipeline
 import time
 
 app = Flask(__name__)
 
-# 選擇運行裝置，如果有 GPU 建議使用 GPU
-device = "cuda" if torch.cuda.is_available() else "cpu"
+# 載入模型
+model_id = "hakurei/waifu-diffusion"
+device = "cpu"
 
-pipe = StableDiffusion3Pipeline.from_pretrained(
-    "stabilityai/stable-diffusion-3.5-medium",
-    torch_dtype=torch.float32 if device == "cpu" else torch.float16,
-    revision="fp16" if device == "cuda" else None,
+# 使用模型
+pipe = StableDiffusionPipeline.from_pretrained(
+    model_id, revision="fp32", torch_dtype=torch.float32
 )
 pipe = pipe.to(device)
 
 
 @app.route("/generate", methods=["POST"])
 def generate():
-    timer = time.time()
+
     data = request.get_json()
     prompt = data.get("prompt")
     if not prompt:
         return jsonify({"error": "No prompt provided"}), 400
 
-    # 產生圖片
+    # 進行生成
+    start = time.time()
     image = pipe(prompt).images[0]
+    end = time.time()
+    print(f"Time: {end - start}")
 
-    # 將圖片存入記憶體的 buffer 並輸出為 PNG
-    buf = BytesIO()
-    image.save(buf, format="PNG")
-    buf.seek(0)
-    print(f"Time: {time.time() - timer}")
-    return send_file(buf, mimetype="image/png")
+    # 將生成的圖片轉為 BytesIO
+    image_byte_array = BytesIO()
+    image.save(image_byte_array, format="PNG")
+    image_byte_array.seek(0)
+
+    return send_file(image_byte_array, mimetype="image/png")
 
 
 if __name__ == "__main__":
-    # 運行於 0.0.0.0:5000，供外部存取，或改為 127.0.0.1
+    # 運行於 0.0.0.0:5000
     app.run(host="0.0.0.0", port=5000)
